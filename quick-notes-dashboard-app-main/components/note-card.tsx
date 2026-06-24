@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Heart, Edit, Trash2, MoreVertical, Copy, ExternalLink, GripVertical, BookOpen } from "lucide-react"
+import { Heart, Edit, Trash2, MoreVertical, Copy, ExternalLink, GripVertical, BookOpen, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import {
@@ -65,6 +65,35 @@ export function NoteCard({ note }: NoteCardProps) {
     e.stopPropagation()
     navigator.clipboard.writeText(`${note.title}\n\n${note.content}`)
     toast.success("Note content copied to clipboard")
+  }
+
+  const handleDownloadClick = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    try {
+      const { jsPDF } = await import("jspdf")
+      const doc = new jsPDF({ unit: "pt", format: "a4" })
+      let y = 40
+      const lineHeight = 16
+
+      doc.setFontSize(18)
+      doc.text(note.title || "Untitled Note", 40, y)
+      y += 30
+
+      doc.setFontSize(12)
+      const lines = doc.splitTextToSize(note.content || "", 520)
+      doc.text(lines, 40, y)
+      y += lines.length * lineHeight + 10
+
+      doc.setFontSize(10)
+      doc.text(`Updated: ${formatDate(note.updatedAt)}`, 40, y)
+
+      const safeTitle = note.title?.replace(/[^a-z0-9_-]/gi, "_").toLowerCase() || "note"
+      doc.save(`${safeTitle}.pdf`)
+      toast.success("Note downloaded")
+    } catch (error) {
+      console.error("Failed to download note:", error)
+      toast.error("Failed to download note")
+    }
   }
 
   // Drag and Drop handlers
@@ -194,6 +223,10 @@ export function NoteCard({ note }: NoteCardProps) {
                 <DropdownMenuItem onClick={handleCopyClick}>
                   <ExternalLink className="h-4 w-4 mr-2" />
                   Copy Content
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleDownloadClick}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Download
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleDeleteClick} className="text-destructive focus:text-destructive">

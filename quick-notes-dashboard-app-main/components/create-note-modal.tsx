@@ -21,6 +21,7 @@ const noteColors = [
 
 export function CreateNoteModal() {
   const { isCreateModalOpen, closeCreateModal, addNote } = useNotes()
+  const [isSaving, setIsSaving] = useState(false)
   const [title, setTitle] = useState("")
   const [content, setContent] = useState("")
   const [selectedColor, setSelectedColor] = useState(noteColors[0].class)
@@ -28,19 +29,26 @@ export function CreateNoteModal() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!title.trim()) return
-
+    setIsSaving(true)
     addNote({
       title: title.trim(),
       content: content.trim(),
       isFavorite: false,
       color: selectedColor,
+      category: "General",
     })
-
-    // Reset form
-    setTitle("")
-    setContent("")
-    setSelectedColor(noteColors[0].class)
-    closeCreateModal()
+      .catch((err) => {
+        console.error("Failed to create note:", err)
+        // optionally show user-facing error here
+      })
+      .finally(() => {
+        setIsSaving(false)
+        // Reset form
+        setTitle("")
+        setContent("")
+        setSelectedColor(noteColors[0].class)
+        closeCreateModal()
+      })
   }
 
   const handleClose = () => {
@@ -107,10 +115,10 @@ export function CreateNoteModal() {
             </Button>
             <Button
               type="submit"
-              disabled={!title.trim()}
+              disabled={!title.trim() || isSaving}
               className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
-              Create Note
+              {isSaving ? "Creating..." : "Create Note"}
             </Button>
           </div>
         </form>

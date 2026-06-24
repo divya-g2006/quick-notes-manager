@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { Search, Heart, Grid3X3, Trash2, Download, Upload } from "lucide-react"
+import { Search, Heart, Grid3X3 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -19,22 +19,11 @@ export function NotesToolbar() {
     filterType,
     setSearchQuery,
     setFilterType,
-    deleteAllNotes,
-    exportNotes,
     importNotes,
   } = useNotes()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const favoriteCount = notes.filter((note) => note.isFavorite).length
-
-  const handleExport = () => {
-    exportNotes()
-    toast.success("Notes exported successfully!")
-  }
-
-  const handleImportClick = () => {
-    fileInputRef.current?.click()
-  }
 
   const handleImportFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -105,39 +94,17 @@ export function NotesToolbar() {
             </Badge>
           </Button>
 
-          {/* Export/Import */}
-          {notes.length > 0 && (
-            <>
-              <Button variant="outline" size="sm" onClick={handleExport} className="bg-transparent">
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
+          {/* Import button always available, export and clear only when notes exist */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json,.pdf"
+            onChange={handleImportFile}
+            className="hidden"
+            aria-label="Import notes file"
+          />
 
-              <Button variant="outline" size="sm" onClick={handleImportClick} className="bg-transparent">
-                <Upload className="h-4 w-4 mr-2" />
-                Import
-              </Button>
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".json"
-                onChange={handleImportFile}
-                className="hidden"
-                aria-label="Import notes file"
-              />
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={deleteAllNotes}
-                className="text-destructive hover:text-destructive hover:bg-destructive/10 bg-transparent"
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Clear All
-              </Button>
-            </>
-          )}
+          {notes.length > 0 && null}
         </div>
       </div>
     </div>
