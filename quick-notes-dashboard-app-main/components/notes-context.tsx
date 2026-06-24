@@ -53,7 +53,7 @@ interface NotesContextType {
 }
 
 const NotesContext = createContext<NotesContextType | undefined>(undefined)
-const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:4000"
+const backendUrl = process.env.NEXT_PUBLIC_API_URL ?? "https://quick-notes-manager.onrender.com"
 
 export function NotesProvider({ children }: { children: ReactNode }) {
   const [notes, setNotes] = useState<Note[]>([])
