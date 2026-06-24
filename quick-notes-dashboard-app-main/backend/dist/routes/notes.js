@@ -8,7 +8,9 @@ const Note_1 = __importDefault(require("../models/Note"));
 const router = (0, express_1.Router)();
 router.get("/", async (req, res) => {
     try {
-        const notes = await Note_1.default.find().sort({ order: 1, createdAt: -1 }).lean();
+        const notes = await Note_1.default.find()
+            .sort({ order: 1, createdAt: -1 })
+            .lean();
         res.json(notes.map((note) => ({
             id: note._id.toString(),
             title: note.title,

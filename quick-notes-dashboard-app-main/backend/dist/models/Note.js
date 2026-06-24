@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const NoteSchema = new mongoose_1.Schema({
     title: { type: String, required: true, trim: true },
-    content: { type: String, required: true, trim: true },
+    content: { type: String, required: false, default: "", trim: true },
     category: { type: String, required: true, default: "General", trim: true },
     color: { type: String, required: true, default: "bg-card", trim: true },
     isFavorite: { type: Boolean, required: true, default: false },

@@ -1,22 +1,34 @@
 import { Router } from "express"
-import Note from "../models/Note"
+import type { Types } from "mongoose"
+import Note, { type INote } from "../models/Note"
+
+type LeanNote = INote & {
+  _id: Types.ObjectId
+  createdAt: Date
+  updatedAt: Date
+}
 
 const router = Router()
 
 router.get("/", async (req, res) => {
   try {
-    const notes = await Note.find().sort({ order: 1, createdAt: -1 }).lean()
-    res.json(notes.map((note) => ({
-      id: note._id.toString(),
-      title: note.title,
-      content: note.content,
-      category: note.category,
-      color: note.color,
-      order: note.order,
-      isFavorite: note.isFavorite,
-      createdAt: note.createdAt,
-      updatedAt: note.updatedAt,
-    })))
+    const notes = await Note.find()
+      .sort({ order: 1, createdAt: -1 })
+      .lean() as Array<LeanNote>
+
+    res.json(
+      notes.map((note) => ({
+        id: note._id.toString(),
+        title: note.title,
+        content: note.content,
+        category: note.category,
+        color: note.color,
+        order: note.order,
+        isFavorite: note.isFavorite,
+        createdAt: note.createdAt,
+        updatedAt: note.updatedAt,
+      })),
+    )
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: "Unable to fetch notes" })

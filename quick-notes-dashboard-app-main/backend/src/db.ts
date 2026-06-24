@@ -9,16 +9,17 @@ if (!mongodbUri) {
   throw new Error("MONGODB_URI is not defined in backend/.env")
 }
 
+type MongooseCache = {
+  conn: typeof mongoose | null
+  promise?: Promise<typeof mongoose> | null
+}
+
 const globalWithMongoose = global as typeof globalThis & {
-  mongoose?: { conn: typeof mongoose | null; promise?: Promise<typeof mongoose> }
+  mongoose?: MongooseCache
 }
 
-let cached = globalWithMongoose.mongoose
-
-if (!cached) {
-  cached = { conn: null, promise: null }
-  globalWithMongoose.mongoose = cached
-}
+const cached: MongooseCache = globalWithMongoose.mongoose ?? { conn: null, promise: null }
+globalWithMongoose.mongoose = cached
 
 async function connectToDatabase() {
   if (cached.conn) {
@@ -27,7 +28,7 @@ async function connectToDatabase() {
 
   if (!cached.promise) {
     mongoose.set("strictQuery", true)
-    cached.promise = mongoose.connect(mongodbUri).then((mongooseInstance) => mongooseInstance)
+    cached.promise = mongoose.connect(mongodbUri as string).then((mongooseInstance) => mongooseInstance)
   }
 
   cached.conn = await cached.promise

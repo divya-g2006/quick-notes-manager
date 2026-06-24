@@ -11,11 +11,8 @@ if (!mongodbUri) {
     throw new Error("MONGODB_URI is not defined in backend/.env");
 }
 const globalWithMongoose = global;
-let cached = globalWithMongoose.mongoose;
-if (!cached) {
-    cached = { conn: null, promise: null };
-    globalWithMongoose.mongoose = cached;
-}
+const cached = globalWithMongoose.mongoose ?? { conn: null, promise: null };
+globalWithMongoose.mongoose = cached;
 async function connectToDatabase() {
     if (cached.conn) {
         return cached.conn;
